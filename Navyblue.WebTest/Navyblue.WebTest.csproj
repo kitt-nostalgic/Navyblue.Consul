@@ -16,8 +16,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Navyblue.Consul.Binder\Navyblue.Extensions.Configuration.Consul.csproj" />
     <ProjectReference Include="..\Navyblue.Consul\Navyblue.Consul.csproj" />
+    <ProjectReference Include="..\Navyblue.Extensions.Configuration.Consul\Navyblue.Extensions.Configuration.Consul.csproj" />
   </ItemGroup>
 
   <ProjectExtensions><VisualStudio><UserProperties appsettings_1json__JsonSchema="" /></VisualStudio></ProjectExtensions>
