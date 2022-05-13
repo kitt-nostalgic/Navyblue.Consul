@@ -1,9 +1,15 @@
-﻿namespace Navyblue.Consul.Agent.Model;
+﻿using System.ComponentModel;
+
+namespace Navyblue.Consul.Agent.Model;
 
 public enum CheckStatus
 {
-    Unknown,
+    [Description("passing")]
     Passing,
+
+    [Description("warning")]
     Warning,
+
+    [Description("critical")]
     Critical
 }

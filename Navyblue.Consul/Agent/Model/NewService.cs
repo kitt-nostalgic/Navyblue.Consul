@@ -10,9 +10,6 @@ public class NewService
 {
     public class Check
     {
-        [JsonProperty("script")]
-        public string? Script { get; set; }
-
         [JsonProperty("dockerContainerId")]
         public string? DockerContainerId { get; set; }
 
@@ -46,6 +43,12 @@ public class NewService
         [JsonProperty("tlsSkipVerify")]
         public bool? TlsSkipVerify { get; set; }
 
+        /// <summary>
+        /// 'passing', 'warning', 'critical'
+        /// </summary>
+        /// <value>
+        /// The status.
+        /// </value>
         [JsonProperty("status")]
         public string? Status { get; set; }
 
@@ -82,7 +85,7 @@ public class NewService
     [JsonProperty("enableTagOverride")]
     public bool? EnableTagOverride { get; set; }
 
-    [JsonProperty("newServiceCheck")]
+    [JsonProperty("check")]
     public Check? NewServiceCheck { get; set; }
 
     [JsonProperty("checks")]
