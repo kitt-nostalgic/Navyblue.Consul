@@ -1,20 +1,24 @@
-﻿using Navyblue.Consul.Agent.Model;
+﻿using Microsoft.Extensions.Configuration;
+using Navyblue.Consul.Agent.Model;
+using Navyblue.Consul.Extensions.Discovery.Heartbeat;
 
 namespace Navyblue.Consul.Extensions.Discovery.ServiceRegistry;
 
 public class ConsulServiceRegistry : IConsulServiceRegistry
 {
     private readonly HeartbeatConfiguration _heartbeatConfiguration;
-    private readonly ConsulDiscoveryConfiguration _consulDiscoveryConfiguration;
+    private readonly ConsulDiscoveryConfiguration _consulDiscoveryConfiguration = new();
+    private readonly IConfiguration _configuration;
     public NewService Service { get; }
 
     public ConsulServiceRegistry(NewService service,
-            ConsulDiscoveryConfiguration consulDiscoveryConfiguration,
+            IConfiguration configuration,
             HeartbeatConfiguration heartbeatConfiguration)
     {
         this.Service = service;
         this._heartbeatConfiguration = heartbeatConfiguration;
-        _consulDiscoveryConfiguration = consulDiscoveryConfiguration;
+        _configuration = configuration;
+        configuration.Bind("Consul:Discovery", _consulDiscoveryConfiguration);
     }
 
     public ConsulServiceRegistry Registration()
@@ -36,7 +40,7 @@ public class ConsulServiceRegistry : IConsulServiceRegistry
             SetCheck(service);
         }
 
-        ConsulServiceRegistry registration = new ConsulServiceRegistry(service, _consulDiscoveryConfiguration, _heartbeatConfiguration);
+        ConsulServiceRegistry registration = new ConsulServiceRegistry(service, _configuration, _heartbeatConfiguration);
 
         return registration;
     }

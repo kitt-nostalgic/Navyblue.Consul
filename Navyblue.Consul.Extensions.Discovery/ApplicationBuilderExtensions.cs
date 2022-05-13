@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Options;
 using Navyblue.BaseLibrary;
 using Navyblue.Consul.Agent.Model;
 using Navyblue.Consul.Extensions.Discovery.ServiceRegistry;
@@ -11,32 +10,60 @@ namespace Navyblue.Consul.Extensions.Discovery
 {
     public static class ApplicationBuilderExtensions
     {
-        public static IApplicationBuilder UseConsulRegisterService(this IApplicationBuilder app, IServiceCollection serviceCollection)
+        public static IServiceCollection AddConsulRegisterService(this IServiceCollection serviceCollection)
         {
             //serviceCollection.AddSingleton<HeartbeatBackgroundService>();
             //serviceCollection.AddHostedService(provider => provider.GetService<HeartbeatBackgroundService>());
 
-            RegisterDiscoveryConfiguration(app, serviceCollection);
+            ServiceProvider serviceProvider=serviceCollection.BuildServiceProvider();
 
-            var consoleDiscoveryConfiguration = app.ApplicationServices.GetRequiredService<IOptions<ConsulDiscoveryConfiguration>>() ?? throw new ArgumentException("Missing dependency", nameof(IOptions<IConsulServiceRegistryClient>));
+            RegisterDiscoveryConfiguration(serviceCollection);
 
-            if (string.IsNullOrEmpty(consoleDiscoveryConfiguration.Value.ServiceName))
+            var configuration = serviceCollection.BuildServiceProvider().GetRequiredService<IConfiguration>();
+
+            var consoleDiscoveryConfiguration = new ConsulDiscoveryConfiguration();
+            configuration.Bind("Consul:Discovery", consoleDiscoveryConfiguration);
+
+            if (!consoleDiscoveryConfiguration.IsEnabled)
             {
-                throw new ArgumentException("Service Name must be configured", nameof(consoleDiscoveryConfiguration.Value.ServiceName));
+                return serviceCollection;
             }
 
-            var serviceId = GetServiceId(consoleDiscoveryConfiguration);
+            if (string.IsNullOrEmpty(consoleDiscoveryConfiguration.ServiceName))
+            {
+                throw new ArgumentException("Service Name must be configured", nameof(consoleDiscoveryConfiguration.ServiceName));
+            }
 
-            var registration = BuildNewService(consoleDiscoveryConfiguration.Value, serviceId);
+            var registration = BuildNewService(consoleDiscoveryConfiguration);
 
             serviceCollection.AddScoped(p=> registration);
 
-            RegisterToRuntime(app);
+            return serviceCollection;
+        }
+
+        public static IApplicationBuilder UseConsulRegisterService(this IApplicationBuilder app)
+        {
+            using (var scope = app.ApplicationServices.CreateScope())
+            {
+                var consulServiceRegistryClient = scope.ServiceProvider.GetRequiredService<IConsulServiceRegistryClient>() ?? throw new ArgumentException("Missing dependency", nameof(IConsulServiceRegistryClient));
+
+                var appLife = scope.ServiceProvider.GetRequiredService<IHostApplicationLifetime>() ?? throw new ArgumentException("Missing dependency", nameof(IHostApplicationLifetime));
+
+                appLife.ApplicationStarted.Register(() =>
+                {
+                    consulServiceRegistryClient.Register();
+                });
+
+                appLife.ApplicationStopping.Register(() =>
+                {
+                    consulServiceRegistryClient.Deregister();
+                });
+            }
 
             return app;
         }
 
-        private static NewService BuildNewService(ConsulDiscoveryConfiguration consoleDiscoveryConfiguration, string serviceId)
+        private static NewService BuildNewService(ConsulDiscoveryConfiguration consoleDiscoveryConfiguration)
         {
             var serviceChecks = new List<NewService.Check>();
 
@@ -44,7 +71,7 @@ namespace Navyblue.Consul.Extensions.Discovery
             {
                 serviceChecks.Add(new NewService.Check()
                 {
-                    Status = CheckStatus.Passing.ToString(),
+                    Status = CheckStatus.Passing.Description(),
                     DeregisterCriticalServiceAfter = "1m",
                     Interval = "5s",
                     Http = consoleDiscoveryConfiguration.Scheme + "://" + consoleDiscoveryConfiguration.IpAddress +
@@ -53,47 +80,32 @@ namespace Navyblue.Consul.Extensions.Discovery
                 });
             }
 
+            var serviceId = GetServiceId(consoleDiscoveryConfiguration);
+
             var registration = new NewService
             {
-                Checks = serviceChecks.ToList(),
-                Address = consoleDiscoveryConfiguration.IpAddress,
                 Id = serviceId,
+                Checks = serviceChecks.ToList(),
                 Name = consoleDiscoveryConfiguration.ServiceName,
+                Address = consoleDiscoveryConfiguration.IpAddress,
                 Port = consoleDiscoveryConfiguration.Port,
             };
 
             return registration;
         }
 
-        private static string GetServiceId(IOptions<ConsulDiscoveryConfiguration> consoleDiscoveryConfiguration)
+        private static string GetServiceId(ConsulDiscoveryConfiguration consoleDiscoveryConfiguration)
         {
-            var serviceId = consoleDiscoveryConfiguration.Value.InstanceId.IsNotNullOrEmpty()
-                ? $"{consoleDiscoveryConfiguration.Value.ServiceName}_{consoleDiscoveryConfiguration.Value.IpAddress}:{consoleDiscoveryConfiguration.Value.Port}"
-                : consoleDiscoveryConfiguration.Value.InstanceId.FormatWith(consoleDiscoveryConfiguration.Value.IpAddress);
+            var serviceId = consoleDiscoveryConfiguration.InstanceId.IsNotNullOrEmpty()
+                ? $"{consoleDiscoveryConfiguration.ServiceName}_{consoleDiscoveryConfiguration.IpAddress}:{consoleDiscoveryConfiguration.Port}"
+                : consoleDiscoveryConfiguration.InstanceId.FormatWith(consoleDiscoveryConfiguration.IpAddress);
+
             return serviceId;
         }
 
-        private static void RegisterToRuntime(IApplicationBuilder app)
+        private static void RegisterDiscoveryConfiguration(IServiceCollection serviceCollection)
         {
-            var appLife = app.ApplicationServices.GetRequiredService<IHostApplicationLifetime>() ??
-                          throw new ArgumentException("Missing dependency", nameof(IHostApplicationLifetime));
-
-            var consulServiceRegistryClient = app.ApplicationServices.GetRequiredService<IConsulServiceRegistryClient>() ??
-                                              throw new ArgumentException("Missing dependency",
-                                                  nameof(IOptions<IConsulServiceRegistryClient>));
-
-            appLife.ApplicationStarted.Register(() => { consulServiceRegistryClient.Register(); });
-
-            appLife.ApplicationStopping.Register(() => { consulServiceRegistryClient.Deregister(); });
-        }
-
-        private static void RegisterDiscoveryConfiguration(IApplicationBuilder app, IServiceCollection serviceCollection)
-        {
-            var configuration = app.ApplicationServices.GetRequiredService<IConfiguration>() ??
-                                throw new ArgumentException("Missing dependency", nameof(IOptions<IConfiguration>));
-
-            serviceCollection.Configure<ConsulDiscoveryConfiguration>(p =>
-                configuration.GetSection("Consul:Discovery").Bind(p));
+            serviceCollection.AddSingleton<HeartbeatConfiguration>();
         }
     }
 }

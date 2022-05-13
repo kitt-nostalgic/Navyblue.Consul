@@ -50,6 +50,8 @@ public class Utils
         IList<string> allParams = new List<string>();
         foreach (IUrlParameters? item in @params)
         {
+            if (item == null) continue;
+
             ((List<string>)allParams).AddRange(item.ToUrlParameters());
         }
 

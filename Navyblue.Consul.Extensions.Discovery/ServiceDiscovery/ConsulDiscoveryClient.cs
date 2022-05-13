@@ -1,4 +1,5 @@
-﻿using Navyblue.Consul.Catalog;
+﻿using Microsoft.Extensions.Configuration;
+using Navyblue.Consul.Catalog;
 using Navyblue.Consul.Health;
 using Navyblue.Consul.Health.Model;
 using Serilog;
@@ -13,13 +14,13 @@ public class ConsulDiscoveryClient : IConsulDiscoveryClient
 
     private readonly IConsulClient _consulClient;
 
-    private readonly ConsulDiscoveryConfiguration _consulDiscoveryConfiguration;
+    private readonly ConsulDiscoveryConfiguration _consulDiscoveryConfiguration = new();
 
     public ConsulDiscoveryClient(ConsulClient consulClient,
-        ConsulDiscoveryConfiguration consulDiscoveryConfiguration)
+        IConfiguration configuration)
     {
         this._consulClient = consulClient;
-        this._consulDiscoveryConfiguration = consulDiscoveryConfiguration;
+        configuration.Bind("Consul:Discovery", _consulDiscoveryConfiguration);
     }
 
     public List<Service> GetInstances(string serviceId)

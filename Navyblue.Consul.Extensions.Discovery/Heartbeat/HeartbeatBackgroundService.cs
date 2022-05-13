@@ -7,11 +7,14 @@ public class HeartbeatBackgroundService: BackgroundService
 {
     private readonly IConsulClient _consulClient;
     private readonly ConsulDiscoveryConfiguration _consulDiscoveryConfiguration;
+    private readonly HeartbeatConfiguration _heartbeatConfiguration;
 
     public HeartbeatBackgroundService(IConsulClient consulClient, 
-        IOptions<ConsulDiscoveryConfiguration> consulDiscoveryConfiguration)
+        IOptions<ConsulDiscoveryConfiguration> consulDiscoveryConfiguration, 
+        IOptions<HeartbeatConfiguration> heartbeatConfiguration)
     {
         _consulClient = consulClient;
+        _heartbeatConfiguration = heartbeatConfiguration.Value;
         _consulDiscoveryConfiguration = consulDiscoveryConfiguration.Value;
     }
 
@@ -33,7 +36,7 @@ public class HeartbeatBackgroundService: BackgroundService
             {
                 _consulClient.AgentCheckPass(checkId);
 
-                await Task.Delay(TimeSpan.FromMilliseconds(30), stoppingToken);
+                await Task.Delay(TimeSpan.FromMilliseconds(_heartbeatConfiguration.ComputeHeartbeatInterval), stoppingToken);
             }
         }, stoppingToken);
     }
