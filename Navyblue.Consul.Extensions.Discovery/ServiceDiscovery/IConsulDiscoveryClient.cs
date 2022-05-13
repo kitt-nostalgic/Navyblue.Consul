@@ -1,6 +1,6 @@
 ﻿using Navyblue.Consul.Health.Model;
 
-namespace Navyblue.Consul.Extensions.Discovery;
+namespace Navyblue.Consul.Extensions.Discovery.ServiceDiscovery;
 
 /// <summary>
 /// 

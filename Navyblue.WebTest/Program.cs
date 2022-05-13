@@ -1,6 +1,5 @@
 ﻿using Microsoft.OpenApi.Models;
-using Navyblue.Consul;
-using Navyblue.Extensions.Configuration.Consul;
+using Navyblue.Consul.Extensions.Discovery;
 using Navyblue.Extensions.Configuration.Consul.Extensions;
 using Navyblue.WebTest;
 
@@ -22,11 +21,12 @@ builder.Services.AddSwaggerGen(c =>
     c.OrderActionsBy(o => o.RelativePath);
 });
 
-builder.Services.AddConsul();
-builder.Configuration.AddConsul(builder.Services.BuildServiceProvider());
+builder.Configuration.AddConsul(builder.Services);
 builder.Services.Configure<ConsulConfigTest>(builder.Configuration.GetSection("UserInfo"));
 
 var app = builder.Build();
+
+app.UseConsulRegisterService(builder.Services);
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

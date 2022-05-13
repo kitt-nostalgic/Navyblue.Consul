@@ -1,7 +1,11 @@
-﻿namespace Navyblue.Consul.Extensions.Discovery;
+﻿namespace Navyblue.Consul.Extensions.Discovery.Heartbeat;
 
-// Provides a task scheduler that ensures a maximum concurrency level while
-// running on top of the thread pool.
+/// <summary>
+/// https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.taskscheduler?view=net-6.0
+/// Provides a task scheduler that ensures a maximum concurrency level while
+/// running on top of the thread pool.
+/// </summary>
+/// <seealso cref="System.Threading.Tasks.TaskScheduler" />
 public class LimitedConcurrencyLevelTaskScheduler : TaskScheduler
 {
     // Indicates whether the current thread is processing work items.
@@ -20,7 +24,7 @@ public class LimitedConcurrencyLevelTaskScheduler : TaskScheduler
     // Creates a new instance with the specified degree of parallelism.
     public LimitedConcurrencyLevelTaskScheduler(int maxDegreeOfParallelism)
     {
-        if (maxDegreeOfParallelism < 1) throw new ArgumentOutOfRangeException("maxDegreeOfParallelism");
+        if (maxDegreeOfParallelism < 1) throw new ArgumentOutOfRangeException(nameof(maxDegreeOfParallelism));
         _maxDegreeOfParallelism = maxDegreeOfParallelism;
     }
 

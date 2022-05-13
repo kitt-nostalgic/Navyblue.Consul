@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Net.Sockets;
+using Navyblue.BaseLibrary;
 
 namespace Navyblue.Consul.Extensions.Discovery
 {
@@ -298,5 +299,7 @@ namespace Navyblue.Consul.Extensions.Discovery
         {
             this.Hostname = hostname;
         }
+
+        public string ServiceId => this.InstanceId.IsNotNullOrEmpty() ? $"{this.ServiceName}_{this.IpAddress}:{this.Port}" : this.InstanceId.FormatWith(this.IpAddress);
     }
 }

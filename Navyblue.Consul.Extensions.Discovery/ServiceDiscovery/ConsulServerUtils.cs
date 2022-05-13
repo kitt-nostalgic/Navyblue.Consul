@@ -2,7 +2,7 @@
 using Navyblue.Consul.Health.Model;
 using Serilog;
 
-namespace Navyblue.Consul.Extensions.Discovery;
+namespace Navyblue.Consul.Extensions.Discovery.ServiceDiscovery;
 
 public class ConsulServerUtils
 {

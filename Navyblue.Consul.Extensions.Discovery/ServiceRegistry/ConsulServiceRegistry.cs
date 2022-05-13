@@ -1,4 +1,5 @@
 ﻿using Navyblue.Consul.Agent.Model;
+using Navyblue.Consul.Extensions.Discovery.Heartbeat;
 
 namespace Navyblue.Consul.Extensions.Discovery.ServiceRegistry;
 
