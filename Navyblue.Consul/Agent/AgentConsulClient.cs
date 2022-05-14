@@ -14,7 +14,7 @@ public sealed class AgentConsulClient : IAgentClient
 
     public AgentConsulClient(IConsulRawClient consulRawClient)
     {
-        this._consulRawClient = consulRawClient;
+        _consulRawClient = consulRawClient;
     }
 
     public ConsulResponse<IDictionary<string, Check>> AgentChecks

@@ -10,7 +10,7 @@ public sealed class QueryConsulClient : IQueryClient
 
     public QueryConsulClient(IConsulRawClient consulRawClient)
     {
-        this._consulRawClient = consulRawClient;
+        _consulRawClient = consulRawClient;
     }
 
     public ConsulResponse<QueryExecution> ExecutePreparedQuery(string uuid, QueryParams? queryParams)

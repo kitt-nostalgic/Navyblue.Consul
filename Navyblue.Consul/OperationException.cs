@@ -16,9 +16,9 @@ public sealed class OperationException : ConsulException
 
     public OperationException(int statusCode, string? statusMessage, string statusContent) : base("OperationException(statusCode=" + statusCode + ", statusMessage='" + statusMessage + "', statusContent='" + statusContent + "')")
     {
-        this.StatusCode = statusCode;
-        this.StatusMessage = statusMessage;
-        this.StatusContent = statusContent;
+        StatusCode = statusCode;
+        StatusMessage = statusMessage;
+        StatusContent = statusContent;
     }
 
     public OperationException(ConsulHttpResponse httpResponse) : this(httpResponse.StatusCode, httpResponse.StatusMessage, httpResponse.Content)

@@ -13,7 +13,7 @@ public sealed class CatalogConsulClient : ICatalogClient
 
     public CatalogConsulClient(IConsulRawClient consulRawClient)
     {
-        this._consulRawClient = consulRawClient;
+        _consulRawClient = consulRawClient;
     }
 
     public ConsulResponse CatalogRegister(CatalogRegistration catalogRegistration)

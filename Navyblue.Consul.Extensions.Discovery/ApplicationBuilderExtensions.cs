@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Navyblue.BaseLibrary;
 using Navyblue.Consul.Agent.Model;
+using Navyblue.Consul.Extensions.Discovery.Heartbeat;
 using Navyblue.Consul.Extensions.Discovery.ServiceRegistry;
 
 namespace Navyblue.Consul.Extensions.Discovery

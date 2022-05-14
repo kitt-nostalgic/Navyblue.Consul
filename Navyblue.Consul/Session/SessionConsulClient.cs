@@ -13,7 +13,7 @@ public sealed class SessionConsulClient : ISessionClient
 
     public SessionConsulClient(IConsulRawClient consulRawClient)
     {
-        this._consulRawClient = consulRawClient;
+        _consulRawClient = consulRawClient;
     }
 
     public ConsulResponse<string> SessionCreate(NewSession newSession, QueryParams? queryParams)

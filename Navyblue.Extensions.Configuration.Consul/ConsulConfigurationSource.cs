@@ -2,6 +2,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Navyblue.Consul.KV;
 using Navyblue.Extensions.Configuration.Consul.Configs;
+using Serilog;
 
 namespace Navyblue.Extensions.Configuration.Consul
 {
@@ -11,25 +12,23 @@ namespace Navyblue.Extensions.Configuration.Consul
     /// <seealso cref="Navyblue.Extensions.Configuration.Consul.IConsulConfigurationSource" />
     internal sealed class ConsulConfigurationSource : IConsulConfigurationSource
     {
-        /// <summary>
-        /// The key value client
-        /// </summary>
         private readonly IKeyValueClient _keyValueClient;
-        /// <summary>
-        /// The consul configuration options
-        /// </summary>
         private ConsulConfigurationOptions _consulConfigurationOptions;
+        private readonly ILogger _logger;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ConsulConfigurationSource"/> class.
         /// </summary>
         /// <param name="keyValueClient">The key value client.</param>
         /// <param name="configureNamedOptions">The configure named options.</param>
+        /// <param name="logger"></param>
         public ConsulConfigurationSource(IKeyValueClient keyValueClient,
-            IOptions<ConsulConfigurationOptions> configureNamedOptions)
+            IOptions<ConsulConfigurationOptions> configureNamedOptions,
+            ILogger logger)
         {
             _consulConfigurationOptions = configureNamedOptions.Value;
             _keyValueClient = keyValueClient;
+            _logger = logger.ForContext<ConsulConfigurationSource>();
         }
 
         /// <summary>
@@ -39,7 +38,7 @@ namespace Navyblue.Extensions.Configuration.Consul
         /// <returns></returns>
         public IConfigurationProvider Build(IConfigurationBuilder builder)
         {
-            return new ConsulConfigurationProvider(_keyValueClient, _consulConfigurationOptions, this);
+            return new ConsulConfigurationProvider(_keyValueClient, _consulConfigurationOptions, _logger);
         }
     }
 }

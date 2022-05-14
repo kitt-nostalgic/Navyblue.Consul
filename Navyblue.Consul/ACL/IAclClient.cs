@@ -13,9 +13,9 @@ public interface IAclClient
 
     ConsulResponse DeleteAcl(string aclId, string? token);
 
-    ConsulResponse<Model.Acl> GetAcl(string id);
+    ConsulResponse<Acl> GetAcl(string id);
 
     ConsulResponse<string> CloneAcl(string aclId, string? token);
 
-    ConsulResponse<IList<Model.Acl>> GetAclList(string? token);
+    ConsulResponse<IList<Acl>> GetAclList(string? token);
 }

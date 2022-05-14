@@ -6,10 +6,6 @@ namespace Navyblue.Consul.Extensions.Discovery.ServiceDiscovery;
 
 public class ConsulServerUtils
 {
-    private static readonly ILogger Log = new LoggerConfiguration()
-        .WriteTo.File("")
-        .CreateLogger();
-
     public static string? FindHost(HealthService healthService)
     {
         Service? service = healthService.Service;
@@ -30,16 +26,8 @@ public class ConsulServerUtils
 
     public static string FixIPv6Address(string address)
     {
-        try
-        {
-            IPHostEntry entry = Dns.GetHostEntry(address);
+        IPHostEntry entry = Dns.GetHostEntry(address);
 
-            return entry.HostName;
-        }
-        catch (Exception e)
-        {
-            Log.Debug("Not InetAddress: " + address + " , resolved as is.");
-            return address;
-        }
+        return entry.HostName;
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
+using Navyblue.BaseLibrary;
 using Navyblue.Consul.Catalog;
 using Navyblue.Consul.Health;
 using Navyblue.Consul.Health.Model;
@@ -8,19 +9,20 @@ namespace Navyblue.Consul.Extensions.Discovery.ServiceDiscovery;
 
 public class ConsulDiscoveryClient : IConsulDiscoveryClient
 {
-    private readonly ILogger _log = new LoggerConfiguration()
-        .WriteTo.File("")
-        .CreateLogger();
+    private readonly ILogger _logger;
 
     private readonly IConsulClient _consulClient;
 
     private readonly ConsulDiscoveryConfiguration _consulDiscoveryConfiguration;
 
     public ConsulDiscoveryClient(ConsulClient consulClient,
-        IConfiguration configuration)
+        IConfiguration configuration,
+        ILogger logger)
     {
         this._consulClient = consulClient;
-        _consulDiscoveryConfiguration = new ConsulDiscoveryConfiguration(configuration);
+        this._consulDiscoveryConfiguration = new ConsulDiscoveryConfiguration(configuration);
+        this._logger = logger.ForContext<ConsulDiscoveryClient>();
+
         configuration.Bind("Consul:Discovery", _consulDiscoveryConfiguration);
     }
 
@@ -49,6 +51,8 @@ public class ConsulDiscoveryClient : IConsulDiscoveryClient
             Token = aclToken
         });
 
+        this._logger.Information("Get the healthy services:" + services.ToJson());
+
         foreach (HealthService service in services.Value ?? new List<HealthService>())
         {
             instances.Add(new Service
@@ -70,10 +74,12 @@ public class ConsulDiscoveryClient : IConsulDiscoveryClient
         {
             QueryParams = QueryParams.DEFAULT
         });
+
         foreach (string serviceId in services.Value.Keys)
         {
             AddInstancesToList(instances, serviceId, QueryParams.DEFAULT);
         }
+
         return instances;
     }
 

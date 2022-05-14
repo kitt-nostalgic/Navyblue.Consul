@@ -5,7 +5,7 @@ namespace Navyblue.Extensions.Configuration.Consul
     /// <summary>
     /// 
     /// </summary>
-    public sealed class ConsulLoadExceptionContext
+    internal sealed class ConsulLoadExceptionContext
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ConsulLoadExceptionContext"/> class.
