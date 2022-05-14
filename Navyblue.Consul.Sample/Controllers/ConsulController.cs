@@ -10,7 +10,7 @@ namespace Navyblue.Consul.Sample.Controllers
     {
         [HttpGet]
         [Route("health")]
-        public string Get(int id)
+        public string Get()
         {
             return "value";
         }

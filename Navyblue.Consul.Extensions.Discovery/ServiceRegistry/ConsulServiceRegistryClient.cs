@@ -10,7 +10,7 @@ public class ConsulServiceRegistryClient : IConsulServiceRegistryClient
     private readonly ILogger _log = new LoggerConfiguration().WriteTo.File("").CreateLogger();
     private readonly IConsulClient _consulClient;
     private readonly IConsulServiceRegistry _consulServiceRegistry;
-    private readonly ConsulDiscoveryConfiguration _consulDiscoveryConfiguration = new();
+    private readonly ConsulDiscoveryConfiguration _consulDiscoveryConfiguration;
 
     public ConsulServiceRegistryClient(IConsulClient client,
         IConfiguration configuration,
@@ -18,6 +18,7 @@ public class ConsulServiceRegistryClient : IConsulServiceRegistryClient
     {
         this._consulClient = client;
         _consulServiceRegistry = consulServiceRegistry;
+        _consulDiscoveryConfiguration = new ConsulDiscoveryConfiguration(configuration);
         configuration.Bind("Consul:Discovery", _consulDiscoveryConfiguration);
     }
 

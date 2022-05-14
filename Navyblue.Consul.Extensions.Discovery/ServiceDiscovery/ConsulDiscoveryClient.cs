@@ -14,12 +14,13 @@ public class ConsulDiscoveryClient : IConsulDiscoveryClient
 
     private readonly IConsulClient _consulClient;
 
-    private readonly ConsulDiscoveryConfiguration _consulDiscoveryConfiguration = new();
+    private readonly ConsulDiscoveryConfiguration _consulDiscoveryConfiguration;
 
     public ConsulDiscoveryClient(ConsulClient consulClient,
         IConfiguration configuration)
     {
         this._consulClient = consulClient;
+        _consulDiscoveryConfiguration = new ConsulDiscoveryConfiguration(configuration);
         configuration.Bind("Consul:Discovery", _consulDiscoveryConfiguration);
     }
 
@@ -87,10 +88,5 @@ public class ConsulDiscoveryClient : IConsulDiscoveryClient
         });
 
         return services.Value?.Keys.ToList();
-    }
-
-    public int GetOrder()
-    {
-        return this._consulDiscoveryConfiguration.Order;
     }
 }

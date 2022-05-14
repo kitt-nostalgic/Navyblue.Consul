@@ -33,10 +33,4 @@ public interface IConsulDiscoveryClient
     /// </summary>
     /// <returns></returns>
     List<string>? GetServices();
-
-    /// <summary>
-    /// Gets the order.
-    /// </summary>
-    /// <returns></returns>
-    int GetOrder();
 }
