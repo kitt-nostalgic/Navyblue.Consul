@@ -13,12 +13,9 @@ namespace Navyblue.Consul.Sample.Controllers
 
         private readonly ILogger<WeatherForecastController> _logger;
 
-        private readonly ITestApiService _testApiService;
-
-        public WeatherForecastController(ILogger<WeatherForecastController> logger, ITestApiService testApiService)
+        public WeatherForecastController(ILogger<WeatherForecastController> logger)
         {
             _logger = logger;
-            _testApiService = testApiService;
         }
 
         [HttpGet]
@@ -32,21 +29,6 @@ namespace Navyblue.Consul.Sample.Controllers
                 Summary = Summaries[Random.Shared.Next(Summaries.Length)]
             })
             .ToArray();
-        }
-
-        [HttpGet]
-        [Route("GetHealthResult")]
-        public async Task<string> GetHealthResult()
-        {
-            try
-            {
-                return await _testApiService.GetHealthResult();
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                throw;
-            }
         }
     }
 }

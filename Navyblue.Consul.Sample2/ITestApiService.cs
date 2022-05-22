@@ -1,11 +1,11 @@
 ﻿using Navyblue.Consul.Extensions.WebApiClient;
 using WebApiClientCore.Attributes;
 
-namespace Navyblue.Consul.Sample;
+namespace Navyblue.Consul.Sample2;
 
 [ConsulService("NavyBlue.WebTest")]
 public interface ITestApiService
 {
-    [HttpGet("api/consul/health")]
-    Task<string> GetHealthResult();
+    [HttpGet("api/consul/InvokeTest")]
+    Task<string> GetInvokeTestResult();
 }
