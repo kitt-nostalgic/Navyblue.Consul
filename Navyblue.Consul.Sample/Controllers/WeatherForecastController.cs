@@ -13,12 +13,16 @@ namespace Navyblue.Consul.Sample.Controllers
 
         private readonly ILogger<WeatherForecastController> _logger;
 
-        public WeatherForecastController(ILogger<WeatherForecastController> logger)
+        private readonly ITestApiService _testApiService;
+
+        public WeatherForecastController(ILogger<WeatherForecastController> logger, ITestApiService testApiService)
         {
             _logger = logger;
+            _testApiService = testApiService;
         }
 
-        [HttpGet(Name = "GetWeatherForecast")]
+        [HttpGet]
+        [Route("GetWeatherForecast")]
         public IEnumerable<WeatherForecast> Get()
         {
             return Enumerable.Range(1, 5).Select(index => new WeatherForecast
@@ -28,6 +32,21 @@ namespace Navyblue.Consul.Sample.Controllers
                 Summary = Summaries[Random.Shared.Next(Summaries.Length)]
             })
             .ToArray();
+        }
+
+        [HttpGet]
+        [Route("GetHealthResult")]
+        public async Task<string> GetHealthResult()
+        {
+            try
+            {
+                return await _testApiService.GetHealthResult();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
         }
     }
 }

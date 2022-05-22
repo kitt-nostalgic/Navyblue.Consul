@@ -61,7 +61,7 @@ public class ConsulDiscoveryClient : IConsulDiscoveryClient
                 Port = service.Service.Port,
                 Address = service.Service.Address,
                 Meta = service.Service.Meta,
-                ServiceText = serviceId
+                ServiceId = serviceId
             });
         }
     }

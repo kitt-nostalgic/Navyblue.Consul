@@ -88,6 +88,10 @@ namespace Navyblue.Consul.Extensions.Discovery
                 Name = consoleDiscoveryConfiguration.ServiceName,
                 Address = consoleDiscoveryConfiguration.IpAddress,
                 Port = consoleDiscoveryConfiguration.Port,
+                Meta = new Dictionary<string, string>
+                {
+                    {"scheme",consoleDiscoveryConfiguration.Scheme}
+                }
             };
 
             return registration;

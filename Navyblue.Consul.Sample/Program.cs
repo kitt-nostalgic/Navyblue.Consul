@@ -1,10 +1,19 @@
 ﻿using Navyblue.Consul.Extensions.Discovery;
 using Navyblue.Consul.Extensions.Discovery.ServiceRegistry;
+using Navyblue.Consul.Extensions.WebApiClient;
 using Navyblue.Consul.Sample;
 using Navyblue.Extensions.Configuration.Consul.Extensions;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
+
+var logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(builder.Configuration)
+    .Enrich.FromLogContext()
+    .CreateLogger();
+
+builder.Logging.ClearProviders();
+builder.Logging.AddSerilog(logger);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
@@ -21,13 +30,7 @@ builder.Services.AddScoped<IConsulServiceRegistryClient, ConsulServiceRegistryCl
 builder.Services.AddScoped<IConsulServiceRegistry, ConsulServiceRegistry>();
 builder.Services.AddConsulRegisterService();
 
-var logger = new LoggerConfiguration()
-    .ReadFrom.Configuration(builder.Configuration)
-    .Enrich.FromLogContext()
-    .CreateLogger();
-
-builder.Logging.ClearProviders();
-builder.Logging.AddSerilog(logger);
+builder.Services.AddHttpApiAsServiceInvoke<ITestApiService>();
 
 WebApplication app = builder.Build();
 

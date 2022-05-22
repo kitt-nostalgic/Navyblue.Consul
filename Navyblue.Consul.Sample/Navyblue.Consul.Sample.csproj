@@ -16,6 +16,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Navyblue.Consul.Extensions.Discovery\Navyblue.Consul.Extensions.Discovery.csproj" />
+    <ProjectReference Include="..\Navyblue.Consul.Extensions.WebApiClient\Navyblue.Consul.Extensions.WebApiClient.csproj" />
     <ProjectReference Include="..\Navyblue.Extensions.Configuration.Consul\Navyblue.Extensions.Configuration.Consul.csproj" />
   </ItemGroup>
 

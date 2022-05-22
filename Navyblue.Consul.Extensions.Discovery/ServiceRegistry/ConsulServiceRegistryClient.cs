@@ -1,13 +1,14 @@
 ﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Navyblue.BaseLibrary;
 using Navyblue.Consul.Health;
-using Serilog;
+using ILogger = Serilog.ILogger;
 
 namespace Navyblue.Consul.Extensions.Discovery.ServiceRegistry;
 
 public class ConsulServiceRegistryClient : IConsulServiceRegistryClient
 {
-    private readonly ILogger _logger = new LoggerConfiguration().WriteTo.File("").CreateLogger();
+    private readonly ILogger<ConsulServiceRegistryClient> _logger;
     private readonly IConsulClient _consulClient;
     private readonly IConsulServiceRegistry _consulServiceRegistry;
     private readonly ConsulDiscoveryConfiguration _consulDiscoveryConfiguration;
@@ -15,10 +16,10 @@ public class ConsulServiceRegistryClient : IConsulServiceRegistryClient
     public ConsulServiceRegistryClient(IConsulClient client,
         IConfiguration configuration,
         IConsulServiceRegistry consulServiceRegistry,
-        ILogger logger)
+        ILogger<ConsulServiceRegistryClient> logger)
     {
         this._consulClient = client;
-        this._logger = logger.ForContext<ConsulServiceRegistryClient>();
+        this._logger = logger;
         this._consulServiceRegistry = consulServiceRegistry;
         this._consulDiscoveryConfiguration = new ConsulDiscoveryConfiguration(configuration);
 
@@ -27,12 +28,12 @@ public class ConsulServiceRegistryClient : IConsulServiceRegistryClient
 
     public void Register()
     {
-        _logger.Information("Registering service with consul: " + _consulServiceRegistry.Service);
+        _logger.LogInformation("Registering service with consul: " + _consulServiceRegistry.Service);
         try
         {
             if (!this._consulDiscoveryConfiguration.IsRegister)
             {
-                _logger.Debug("Registration disabled.");
+                _logger.LogDebug("Registration disabled.");
                 return;
             }
 
@@ -44,12 +45,12 @@ public class ConsulServiceRegistryClient : IConsulServiceRegistryClient
         {
             if (this._consulDiscoveryConfiguration.IsFailFast)
             {
-                _logger.Error("Error registering service with consul: " + _consulServiceRegistry.Service,
+                _logger.LogError("Error registering service with consul: " + _consulServiceRegistry.Service,
                         e);
                 throw;
             }
 
-            _logger.Warning("Failfast is false. Error registering service with consul: " + _consulServiceRegistry.Service, e);
+            _logger.LogWarning("Failfast is false. Error registering service with consul: " + _consulServiceRegistry.Service, e);
         }
     }
 
@@ -60,7 +61,7 @@ public class ConsulServiceRegistryClient : IConsulServiceRegistryClient
             return;
         }
 
-        _logger.Information("Deregistering service with consul: " + _consulServiceRegistry.GetInstanceId());
+        _logger.LogInformation("Deregistering service with consul: " + _consulServiceRegistry.GetInstanceId());
 
         this._consulClient.AgentServiceDeregister(_consulServiceRegistry.GetInstanceId(), this._consulDiscoveryConfiguration.AclToken);
     }

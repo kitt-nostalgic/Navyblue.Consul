@@ -22,7 +22,8 @@ public static class ConsulConfigurationExtensions
 
         var serviceProvider = serviceCollection.BuildServiceProvider();
 
-        ILogger logger = serviceProvider.GetService<ILogger>() ?? throw new NullReferenceException($"Can't get {nameof(ILogger)} instance from DI Container"); ;
+        //ILogger logger = serviceProvider.GetService<ILogger>() ?? throw new NullReferenceException($"Can't get {nameof(ILogger)} instance from DI Container"); ;
+        ILogger logger = Log.ForContext<IConsulConfigurationProvider>();
 
         IKeyValueClient? kvClient = serviceProvider.GetService<IKeyValueClient>();
         if (kvClient == null)

@@ -76,6 +76,9 @@ public class NewService
     [JsonProperty("address")]
     public string? Address { get; set; }
 
+    [JsonIgnore]
+    public string? ServiceEndpoint => this.Meta["scheme"] + "://" + this.Address;
+
     [JsonProperty("meta")]
     public IDictionary<string, string>? Meta { get; set; }
 
@@ -90,9 +93,4 @@ public class NewService
 
     [JsonProperty("checks")]
     public IList<Check>? Checks { get; set; }
-
-    public override string ToString()
-    {
-        return this.ToJson();
-    }
 }
