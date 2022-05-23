@@ -13,7 +13,7 @@ public class CoordinateConsulClient : ICoordinateClient
 
     public CoordinateConsulClient(IConsulRawClient consulRawClient)
     {
-        this._consulRawClient = consulRawClient;
+        _consulRawClient = consulRawClient;
     }
 
     public virtual ConsulResponse<IList<Datacenter>> Datacenters

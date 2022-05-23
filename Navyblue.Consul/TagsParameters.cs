@@ -12,6 +12,7 @@ public sealed class TagsParameters : IUrlParameters
     public IList<string> ToUrlParameters()
     {
         IList<string> @params = new List<string>();
+        if (tags == null) return @params;
 
         foreach (string tag in tags)
         {

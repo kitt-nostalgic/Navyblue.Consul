@@ -13,7 +13,7 @@ public sealed class AclConsulClient : IAclClient
 
     public AclConsulClient(IConsulRawClient consulRawClient)
     {
-        this._consulRawClient = consulRawClient;
+        _consulRawClient = consulRawClient;
     }
 
     public ConsulResponse<string> CreateAcl(CreateAcl newAcl, string? token)
@@ -58,22 +58,22 @@ public sealed class AclConsulClient : IAclClient
         throw new OperationException(httpResponse);
     }
 
-    public ConsulResponse<Model.Acl> GetAcl(string id)
+    public ConsulResponse<Acl> GetAcl(string id)
     {
         ConsulHttpResponse httpResponse = _consulRawClient.MakeGetRequest("/v1/acl/info/" + id);
 
         if (httpResponse.StatusCode == 200)
         {
-            IList<Model.Acl> value = httpResponse.Content.FromJson<IList<Model.Acl>>();
+            IList<Acl> value = httpResponse.Content.FromJson<IList<Acl>>();
 
             if (value.Count == 0)
             {
-                return new ConsulResponse<Model.Acl>(null, httpResponse);
+                return new ConsulResponse<Acl>(null, httpResponse);
             }
 
             if (value.Count == 1)
             {
-                return new ConsulResponse<Model.Acl>(value[0], httpResponse);
+                return new ConsulResponse<Acl>(value[0], httpResponse);
             }
             throw new ConsulException("Strange response (list size=" + value.Count + ")");
         }
@@ -95,15 +95,15 @@ public sealed class AclConsulClient : IAclClient
         throw new OperationException(httpResponse);
     }
 
-    public ConsulResponse<IList<Model.Acl>> GetAclList(string? token)
+    public ConsulResponse<IList<Acl>> GetAclList(string? token)
     {
         IUrlParameters? tokenParams = !string.IsNullOrWhiteSpace(token) ? new SingleUrlParameters("token", token) : null;
         ConsulHttpResponse httpResponse = _consulRawClient.MakeGetRequest("/v1/acl/list", tokenParams!);
 
         if (httpResponse.StatusCode == 200)
         {
-            IList<Model.Acl> value = httpResponse.Content.FromJson<IList<Model.Acl>>();
-            return new ConsulResponse<IList<Model.Acl>>(value, httpResponse);
+            IList<Acl> value = httpResponse.Content.FromJson<IList<Acl>>();
+            return new ConsulResponse<IList<Acl>>(value, httpResponse);
         }
 
         throw new OperationException(httpResponse);

@@ -2,7 +2,7 @@
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
-namespace Navyblue.Consul.Sample.Controllers
+namespace Navyblue.Consul.Sample2.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -11,13 +11,6 @@ namespace Navyblue.Consul.Sample.Controllers
         [HttpGet]
         [Route("health")]
         public string Get()
-        {
-            return "value";
-        }
-
-        [HttpGet]
-        [Route("invokeTest")]
-        public string InvokeTest()
         {
             return "value";
         }

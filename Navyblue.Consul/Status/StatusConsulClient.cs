@@ -12,7 +12,7 @@ public sealed class StatusConsulClient : IStatusClient
 
     public StatusConsulClient(IConsulRawClient consulRawClient)
     {
-        this._consulRawClient = consulRawClient;
+        _consulRawClient = consulRawClient;
     }
 
     public ConsulResponse<string> StatusLeader

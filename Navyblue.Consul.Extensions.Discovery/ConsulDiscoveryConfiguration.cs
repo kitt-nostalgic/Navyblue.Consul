@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Net.Sockets;
+using Microsoft.Extensions.Configuration;
 using Navyblue.BaseLibrary;
 
 namespace Navyblue.Consul.Extensions.Discovery
@@ -9,6 +10,13 @@ namespace Navyblue.Consul.Extensions.Discovery
     /// </summary>
     public class ConsulDiscoveryConfiguration
     {
+        private readonly IConfiguration _configuration;
+
+        public ConsulDiscoveryConfiguration(IConfiguration configuration)
+        {
+            _configuration = configuration;
+        }
+
         /// <summary>
         /// Gets or sets the acl token.
         /// </summary>
@@ -82,6 +90,10 @@ namespace Navyblue.Consul.Extensions.Discovery
         {
             get
             {
+#if DEBUG
+                return "localhost";
+#endif
+
                 using (Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, 0))
                 {
                     socket.Connect("www.baidu.com", 80);
@@ -102,13 +114,41 @@ namespace Navyblue.Consul.Extensions.Discovery
         /// </value>
         public string? Hostname { get; set; }
 
+
+        private int? _port;
+
         /// <summary>
         /// Port to register the service under (defaults to listening port)
         /// </summary>
         /// <value>
         /// The port.
         /// </value>
-        public int Port { get; set; }
+        public int Port
+        {
+            get
+            {
+                if (_port != null) return _port.Value;
+
+                var currentUrl = _configuration.GetSection("ASPNETCORE_URLS").Value;
+                var httpScheme = _configuration.GetSection("Consul:Discovery:Scheme").Value;
+
+                string[] urls = currentUrl.Split(";");
+                string scheme = httpScheme.IsNullOrWhiteSpace() ? this.Scheme : httpScheme;
+
+                foreach (var url in urls)
+                {
+                    string[] urlParts = url.Split(":");
+                    if (urlParts[0] == scheme)
+                    {
+                        this._port = Convert.ToInt32(urlParts[2]);
+                        break;
+                    }
+                }
+
+                return _port.GetValueOrDefault();
+            }
+            set => this._port = value;
+        }
 
         /// <summary>
         /// Use ip address rather than hostname during registration.
@@ -156,15 +196,7 @@ namespace Navyblue.Consul.Extensions.Discovery
         /// <value>
         /// The instance identifier.
         /// </value>
-        public string? InstanceId { get; set; }
-
-        /// <summary>
-        /// Service instance zone
-        /// </summary>
-        /// <value>
-        /// The instance zone.
-        /// </value>
-        public string? InstanceZone { get; set; }
+        public string InstanceId { get; set; }
 
         /// <summary>
         /// Service instance group.
@@ -174,13 +206,7 @@ namespace Navyblue.Consul.Extensions.Discovery
         /// </value>
         public string? InstanceGroup { get; set; }
 
-        /// <summary>
-        /// Service instance zone comes from metadata. This allows changing the metadata tag name.
-        /// </summary>
-        /// <value>
-        /// The default name of the zone metadata.
-        /// </value>
-        public string DefaultZoneMetadataName { get; set; } = "zone";
+        private string _scheme = "http";
 
         /// <summary>
         /// Whether to register an http or https service
@@ -188,7 +214,21 @@ namespace Navyblue.Consul.Extensions.Discovery
         /// <value>
         /// The scheme.
         /// </value>
-        public string Scheme { get; set; } = "http";
+        public string Scheme {
+            get
+            {
+                var currentUrl = _configuration.GetSection("ASPNETCORE_URLS").Value;
+
+                string? url = currentUrl.Split(";").FirstOrDefault();
+                if (url.IsNotNullOrWhiteSpace())
+                {
+                    string[] urlParts = url.Split(":");
+                    this._scheme = urlParts[0];
+                }
+
+                return _scheme;
+            }
+        }
 
         /// <summary>
         /// Map of serviceId's -&gt; tag to query for in server list. This allows filtering services by a single tag.
@@ -256,22 +296,6 @@ namespace Navyblue.Consul.Extensions.Discovery
         public bool IsFailFast { get; set; } = true;
 
         /// <summary>
-        /// Skips certificate verification during service checks if true, otherwise runs certificate verification.
-        /// </summary>
-        /// <value>
-        ///   <c>true</c> if this instance is health check TLS skip verify; otherwise, <c>false</c>.
-        /// </value>
-        public bool IsHealthCheckTlsSkipVerify { get; set; }
-
-        /// <summary>
-        /// Order of the discovery client used by `CompositeDiscoveryClient` for sorting available clients.
-        /// </summary>
-        /// <value>
-        /// The order.
-        /// </value>
-        public int Order { get; set; } = 0;
-
-        /// <summary>
         /// Gets the query tag for service.
         /// </summary>
         /// <param name="serviceId">The service identifier.</param>
@@ -289,15 +313,6 @@ namespace Navyblue.Consul.Extensions.Discovery
         public string? GetHostname()
         {
             return this.IsPreferIpAddress ? this.IpAddress : this.Hostname;
-        }
-
-        /// <summary>
-        /// Sets the hostname.
-        /// </summary>
-        /// <param name="hostname">The hostname.</param>
-        public void SetHostname(string? hostname)
-        {
-            this.Hostname = hostname;
         }
 
         public string ServiceId => this.InstanceId.IsNotNullOrEmpty() ? $"{this.ServiceName}_{this.IpAddress}:{this.Port}" : this.InstanceId.FormatWith(this.IpAddress);

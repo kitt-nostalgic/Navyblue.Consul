@@ -7,7 +7,7 @@ namespace Navyblue.Consul.Extensions.Discovery.ServiceRegistry;
 public class ConsulServiceRegistry : IConsulServiceRegistry
 {
     private readonly HeartbeatConfiguration _heartbeatConfiguration;
-    private readonly ConsulDiscoveryConfiguration _consulDiscoveryConfiguration = new();
+    private readonly ConsulDiscoveryConfiguration _consulDiscoveryConfiguration;
     private readonly IConfiguration _configuration;
     public NewService Service { get; }
 
@@ -18,6 +18,7 @@ public class ConsulServiceRegistry : IConsulServiceRegistry
         this.Service = service;
         this._heartbeatConfiguration = heartbeatConfiguration;
         _configuration = configuration;
+        _consulDiscoveryConfiguration = new ConsulDiscoveryConfiguration(_configuration);
         configuration.Bind("Consul:Discovery", _consulDiscoveryConfiguration);
     }
 
@@ -63,10 +64,6 @@ public class ConsulServiceRegistry : IConsulServiceRegistry
     {
         List<string> tags = new List<string>(_consulDiscoveryConfiguration.Tags);
 
-        if (!string.IsNullOrWhiteSpace(_consulDiscoveryConfiguration.InstanceZone))
-        {
-            tags.Add(_consulDiscoveryConfiguration.DefaultZoneMetadataName + "=" + _consulDiscoveryConfiguration.InstanceZone);
-        }
         if (!string.IsNullOrWhiteSpace(_consulDiscoveryConfiguration.InstanceGroup))
         {
             tags.Add("group=" + _consulDiscoveryConfiguration.InstanceGroup);
@@ -101,7 +98,6 @@ public class ConsulServiceRegistry : IConsulServiceRegistry
         check.Header = _consulDiscoveryConfiguration.HealthCheckHeaders;
         check.Interval = _consulDiscoveryConfiguration.HealthCheckInterval;
         check.Timeout = _consulDiscoveryConfiguration.HealthCheckTimeout;
-        check.TlsSkipVerify = _consulDiscoveryConfiguration.IsHealthCheckTlsSkipVerify;
         return check;
     }
 

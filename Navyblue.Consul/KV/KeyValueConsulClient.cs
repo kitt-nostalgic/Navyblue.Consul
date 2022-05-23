@@ -13,7 +13,7 @@ public sealed class KeyValueConsulClient : IKeyValueClient
 
     public KeyValueConsulClient(IConsulRawClient consulRawClient)
     {
-        this._consulRawClient = consulRawClient;
+        _consulRawClient = consulRawClient;
     }
 
     public ConsulResponse<GetValue> GetKvValue(string key)

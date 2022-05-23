@@ -13,7 +13,7 @@ public sealed class EventConsulClient : IEventClient
 
     public EventConsulClient(IConsulRawClient consulRawClient)
     {
-        this._consulRawClient = consulRawClient;
+        _consulRawClient = consulRawClient;
     }
 
 

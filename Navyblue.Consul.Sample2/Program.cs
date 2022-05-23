@@ -1,6 +1,7 @@
-﻿using Navyblue.Consul.Extensions.Discovery;
+using Navyblue.Consul.Extensions.Discovery;
 using Navyblue.Consul.Extensions.Discovery.ServiceRegistry;
-using Navyblue.Consul.Sample;
+using Navyblue.Consul.Extensions.WebApiClient;
+using Navyblue.Consul.Sample2;
 using Navyblue.Extensions.Configuration.Consul.Extensions;
 using Serilog;
 
@@ -24,10 +25,11 @@ builder.Services.AddOptions();
 
 builder.Configuration.AddConsul(builder.Services);
 
-builder.Services.Configure<ConsulConfigTest>(builder.Configuration.GetSection("UserInfo"));
 builder.Services.AddScoped<IConsulServiceRegistryClient, ConsulServiceRegistryClient>();
 builder.Services.AddScoped<IConsulServiceRegistry, ConsulServiceRegistry>();
 builder.Services.AddConsulRegisterService();
+
+builder.Services.AddHttpApiAsServiceInvoke<ITestApiService>();
 
 WebApplication app = builder.Build();
 

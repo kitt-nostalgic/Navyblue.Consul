@@ -12,6 +12,7 @@ public sealed class NodeMetaParameters : IUrlParameters
     public IList<string> ToUrlParameters()
     {
         IList<string> @params = new List<string>();
+        if (nodeMeta == null) return @params;
 
         string key = "node-meta";
 

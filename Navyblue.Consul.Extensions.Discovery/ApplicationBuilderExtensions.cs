@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Navyblue.BaseLibrary;
 using Navyblue.Consul.Agent.Model;
+using Navyblue.Consul.Extensions.Discovery.Heartbeat;
 using Navyblue.Consul.Extensions.Discovery.ServiceRegistry;
 
 namespace Navyblue.Consul.Extensions.Discovery
@@ -15,13 +16,11 @@ namespace Navyblue.Consul.Extensions.Discovery
             //serviceCollection.AddSingleton<HeartbeatBackgroundService>();
             //serviceCollection.AddHostedService(provider => provider.GetService<HeartbeatBackgroundService>());
 
-            ServiceProvider serviceProvider=serviceCollection.BuildServiceProvider();
-
-            RegisterDiscoveryConfiguration(serviceCollection);
+            serviceCollection.AddSingleton<HeartbeatConfiguration>();
 
             var configuration = serviceCollection.BuildServiceProvider().GetRequiredService<IConfiguration>();
 
-            var consoleDiscoveryConfiguration = new ConsulDiscoveryConfiguration();
+            var consoleDiscoveryConfiguration = new ConsulDiscoveryConfiguration(configuration);
             configuration.Bind("Consul:Discovery", consoleDiscoveryConfiguration);
 
             if (!consoleDiscoveryConfiguration.IsEnabled)
@@ -89,6 +88,10 @@ namespace Navyblue.Consul.Extensions.Discovery
                 Name = consoleDiscoveryConfiguration.ServiceName,
                 Address = consoleDiscoveryConfiguration.IpAddress,
                 Port = consoleDiscoveryConfiguration.Port,
+                Meta = new Dictionary<string, string>
+                {
+                    {"scheme",consoleDiscoveryConfiguration.Scheme}
+                }
             };
 
             return registration;
@@ -98,14 +101,9 @@ namespace Navyblue.Consul.Extensions.Discovery
         {
             var serviceId = consoleDiscoveryConfiguration.InstanceId.IsNotNullOrEmpty()
                 ? $"{consoleDiscoveryConfiguration.ServiceName}_{consoleDiscoveryConfiguration.IpAddress}:{consoleDiscoveryConfiguration.Port}"
-                : consoleDiscoveryConfiguration.InstanceId.FormatWith(consoleDiscoveryConfiguration.IpAddress);
+                : consoleDiscoveryConfiguration.InstanceId.FormatWith(consoleDiscoveryConfiguration.IpAddress, consoleDiscoveryConfiguration.Port);
 
             return serviceId;
-        }
-
-        private static void RegisterDiscoveryConfiguration(IServiceCollection serviceCollection)
-        {
-            serviceCollection.AddSingleton<HeartbeatConfiguration>();
         }
     }
 }

@@ -13,7 +13,7 @@ public sealed class HealthConsulClient : IHealthClient
 
     public HealthConsulClient(IConsulRawClient consulRawClient)
     {
-        this._consulRawClient = consulRawClient;
+        _consulRawClient = consulRawClient;
     }
 
     public ConsulResponse<IList<Check>> GetHealthChecksForNode(string nodeName, QueryParams? queryParams)

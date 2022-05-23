@@ -8,7 +8,7 @@ public class Service
     public string? Id { get; set; }
 
     [JsonProperty("service")]
-    public string? ServiceText { get; set; }
+    public string? ServiceId { get; set; }
 
     [JsonProperty("tags")]
     public IList<string>? Tags { get; set; }

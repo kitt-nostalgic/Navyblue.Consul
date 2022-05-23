@@ -11,11 +11,6 @@ namespace Navyblue.Consul.Extensions.Discovery.Heartbeat;
 public class HeartbeatConfiguration
 {
     /// <summary>
-    /// The log
-    /// </summary>
-    private readonly ILogger _log = new LoggerConfiguration().WriteTo.File("").CreateLogger();
-
-    /// <summary>
     /// </summary>
     /// <value>
     ///   <c>true</c> if enabled; otherwise, <c>false</c>.
@@ -62,7 +57,6 @@ public class HeartbeatConfiguration
             double max = Math.Max(interval, 1);
             int ttlMinus1 = this.TtlValue - 1;
             double min = Math.Max(ttlMinus1, max);
-            _log.Debug("Computed heartbeatInterval: " + Math.Round(1000 * min));
             return Math.Round(1000 * min);
         }
     }
@@ -73,7 +67,7 @@ public class HeartbeatConfiguration
     /// <returns>
     /// A string that represents the current object.
     /// </returns>
-    public override String ToString()
+    public override string ToString()
     {
         return this.ToJson();
     }
